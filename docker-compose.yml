@@ -1,0 +1,19 @@
+version: "3"
+services: 
+  db:
+    image: posrgres
+    networks: 
+        - webnet
+    environment: 
+      POSTGRES_PASSWORD: saizszmufvlzuvw0
+      POSTGRES_USER: avnadmin
+      POSTGRES_DB: slack
+      
+web:
+   image: slack-server
+   ports: :
+     - "8080:8080"
+   networks: 
+    - webnet
+networks: 
+  webnet:
