@@ -1,16 +1,16 @@
-"use strict";
+'use strict';
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _graphqlRedisSubscriptions = require("graphql-redis-subscriptions");
+var _graphqlRedisSubscriptions = require('graphql-redis-subscriptions');
 
 exports.default = new _graphqlRedisSubscriptions.RedisPubSub({
   connection: {
-    host: "127.0.0.1",
+    host: process.env.REDIS_HOST || '127.0.0.1',
     port: 6379,
-    retryStrategy: function retryStrategy(options) {
+    retry_strategy: function retry_strategy(options) {
       return Math.max(options.attempt * 100, 3000);
     }
   }

@@ -1,75 +1,75 @@
-"use strict";
+'use strict';
 
-var _keys = require("babel-runtime/core-js/object/keys");
+var _keys = require('babel-runtime/core-js/object/keys');
 
 var _keys2 = _interopRequireDefault(_keys);
 
-var _regenerator = require("babel-runtime/regenerator");
+var _regenerator = require('babel-runtime/regenerator');
 
 var _regenerator2 = _interopRequireDefault(_regenerator);
 
-var _asyncToGenerator2 = require("babel-runtime/helpers/asyncToGenerator");
+var _asyncToGenerator2 = require('babel-runtime/helpers/asyncToGenerator');
 
 var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
 
-var _express = require("express");
+var _express = require('express');
 
 var _express2 = _interopRequireDefault(_express);
 
-var _bodyParser = require("body-parser");
+var _bodyParser = require('body-parser');
 
 var _bodyParser2 = _interopRequireDefault(_bodyParser);
 
-var _http = require("http");
+var _http = require('http');
 
-var _graphql = require("graphql");
+var _graphql = require('graphql');
 
-var _subscriptionsTransportWs = require("subscriptions-transport-ws");
+var _subscriptionsTransportWs = require('subscriptions-transport-ws');
 
-var _expressGraphql = require("express-graphql");
+var _expressGraphql = require('express-graphql');
 
-var _apolloServerExpress = require("apollo-server-express");
+var _apolloServerExpress = require('apollo-server-express');
 
-var _graphqlTools = require("graphql-tools");
+var _graphqlTools = require('graphql-tools');
 
-var _path = require("path");
+var _path = require('path');
 
 var _path2 = _interopRequireDefault(_path);
 
-var _mergeGraphqlSchemas = require("merge-graphql-schemas");
+var _mergeGraphqlSchemas = require('merge-graphql-schemas');
 
-var _cors = require("cors");
+var _cors = require('cors');
 
 var _cors2 = _interopRequireDefault(_cors);
 
-var _jsonwebtoken = require("jsonwebtoken");
+var _jsonwebtoken = require('jsonwebtoken');
 
 var _jsonwebtoken2 = _interopRequireDefault(_jsonwebtoken);
 
-var _auth = require("./auth");
+var _auth = require('./auth');
 
-var _formidable = require("formidable");
+var _formidable = require('formidable');
 
 var _formidable2 = _interopRequireDefault(_formidable);
 
-var _dataloader = require("dataloader");
+var _dataloader = require('dataloader');
 
 var _dataloader2 = _interopRequireDefault(_dataloader);
 
-var _batchFunction = require("./batchFunction");
+var _batchFunction = require('./batchFunction');
 
-var _models = require("./models");
+var _models = require('./models');
 
 var _models2 = _interopRequireDefault(_models);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var SECRET = "12345";
-var SECRET2 = "1234512345";
+var SECRET = '12345';
+var SECRET2 = '1234512345';
 
-var typeDefs = (0, _mergeGraphqlSchemas.mergeTypes)((0, _mergeGraphqlSchemas.fileLoader)(_path2.default.join(__dirname, "./schema")));
+var typeDefs = (0, _mergeGraphqlSchemas.mergeTypes)((0, _mergeGraphqlSchemas.fileLoader)(_path2.default.join(__dirname, './schema')));
 
-var resolvers = (0, _mergeGraphqlSchemas.mergeResolvers)((0, _mergeGraphqlSchemas.fileLoader)(_path2.default.join(__dirname, "./resolvers")));
+var resolvers = (0, _mergeGraphqlSchemas.mergeResolvers)((0, _mergeGraphqlSchemas.fileLoader)(_path2.default.join(__dirname, './resolvers')));
 
 var schema = new _graphqlTools.makeExecutableSchema({
   typeDefs: typeDefs,
@@ -84,7 +84,7 @@ var addUser = function () {
       while (1) {
         switch (_context.prev = _context.next) {
           case 0:
-            token = req.headers["xtoken"];
+            token = req.headers['xtoken'];
 
             if (!token) {
               _context.next = 18;
@@ -105,8 +105,8 @@ var addUser = function () {
 
           case 10:
             _context.prev = 10;
-            _context.t0 = _context["catch"](2);
-            refreshToken = req.headers["xrefreshtoken"];
+            _context.t0 = _context['catch'](2);
+            refreshToken = req.headers['xrefreshtoken'];
             _context.next = 15;
             return (0, _auth.refreshTokens)(token, refreshToken, _models2.default, SECRET, SECRET2);
 
@@ -117,15 +117,15 @@ var addUser = function () {
 
             if (newTokens.token && newTokens.refreshToken) {
               // res.set("Access-Control-Expose-Headers", "*");
-              res.setHeader("xToken", newTokens.token);
-              res.setHeader("xRefreshToken", newTokens.refreshToken);
+              res.setHeader('xToken', newTokens.token);
+              res.setHeader('xRefreshToken', newTokens.refreshToken);
             }
 
           case 18:
             next();
 
           case 19:
-          case "end":
+          case 'end':
             return _context.stop();
         }
       }
@@ -136,10 +136,10 @@ var addUser = function () {
     return _ref.apply(this, arguments);
   };
 }();
-var uploadDir = "files";
+var uploadDir = 'files';
 
 var fileMiddleware = function fileMiddleware(req, res, next) {
-  if (!req.is("multipart/form-data")) {
+  if (!req.is('multipart/form-data')) {
     return next();
   }
 
@@ -176,12 +176,12 @@ var fileMiddleware = function fileMiddleware(req, res, next) {
 var app = (0, _express2.default)();
 app.use((0, _cors2.default)());
 // app.use(bodyParser.json());
-app.use("/files", _express2.default.static("files"));
+app.use('/files', _express2.default.static('files'));
 
 app.use(addUser);
 app.use(fileMiddleware);
 app.use((0, _expressGraphql.graphqlHTTP)(function (req, res) {
-  res.set({ "Access-Control-Expose-Headers": "*" }); // The frontEnd can read refreshToken
+  res.set({ 'Access-Control-Expose-Headers': '*' }); // The frontEnd can read refreshToken
 
   return {
     schema: schema,
@@ -193,7 +193,7 @@ app.use((0, _expressGraphql.graphqlHTTP)(function (req, res) {
       channelLoader: new _dataloader2.default(function (ids) {
         return (0, _batchFunction.channelBatcher)(ids, _models2.default, req.user);
       }),
-      serverUrl: req.protocol + "://" + req.get("host")
+      serverUrl: req.protocol + '://' + req.get('host')
     },
     graphiql: true
     // subsriptionsEndpoint: "ws://localhost:8081/subscriptions",
@@ -204,7 +204,7 @@ var server = (0, _http.createServer)(app);
 
 _models2.default.sequelize.sync().then(function () {
   server.listen(8080, function () {
-    console.log("server on port 8080");
+    console.log('server on port 8080');
     new _subscriptionsTransportWs.SubscriptionServer({
       execute: _graphql.execute,
       subscribe: _graphql.subscribe,
@@ -232,23 +232,23 @@ _models2.default.sequelize.sync().then(function () {
                 case 4:
                   _ref6 = _context2.sent;
                   user = _ref6.user;
-                  return _context2.abrupt("return", { models: _models2.default, user: user });
+                  return _context2.abrupt('return', { models: _models2.default, user: user });
 
                 case 9:
                   _context2.prev = 9;
-                  _context2.t0 = _context2["catch"](1);
+                  _context2.t0 = _context2['catch'](1);
                   _context2.next = 13;
                   return (0, _auth.refreshTokens)(token, refreshToken, _models2.default, SECRET, SECRET2);
 
                 case 13:
                   newTokens = _context2.sent;
-                  return _context2.abrupt("return", { models: _models2.default, user: newTokens.user });
+                  return _context2.abrupt('return', { models: _models2.default, user: newTokens.user });
 
                 case 15:
-                  return _context2.abrupt("return", {});
+                  return _context2.abrupt('return', {});
 
                 case 16:
-                case "end":
+                case 'end':
                   return _context2.stop();
               }
             }
@@ -261,7 +261,7 @@ _models2.default.sequelize.sync().then(function () {
       }()
     }, {
       server: server,
-      path: "/subscriptions"
+      path: '/subscriptions'
     });
   });
 });

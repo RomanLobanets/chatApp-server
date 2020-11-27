@@ -1,30 +1,30 @@
-import express from "express";
-import bodyParser from "body-parser";
+import express from 'express';
+import bodyParser from 'body-parser';
 
-import { createServer } from "http";
-import { execute, subscribe } from "graphql";
-import { SubscriptionServer } from "subscriptions-transport-ws";
+import { createServer } from 'http';
+import { execute, subscribe } from 'graphql';
+import { SubscriptionServer } from 'subscriptions-transport-ws';
 
-import { graphqlHTTP } from "express-graphql";
-import { ApolloServer, gql } from "apollo-server-express";
-import { makeExecutableSchema } from "graphql-tools";
-import path from "path";
-import { fileLoader, mergeTypes, mergeResolvers } from "merge-graphql-schemas";
-import cors from "cors";
-import jwt from "jsonwebtoken";
-import { refreshTokens } from "./auth";
-import formidable from "formidable";
-import Dataloader from "dataloader";
-import { channelBatcher } from "./batchFunction";
+import { graphqlHTTP } from 'express-graphql';
+import { ApolloServer, gql } from 'apollo-server-express';
+import { makeExecutableSchema } from 'graphql-tools';
+import path from 'path';
+import { fileLoader, mergeTypes, mergeResolvers } from 'merge-graphql-schemas';
+import cors from 'cors';
+import jwt from 'jsonwebtoken';
+import { refreshTokens } from './auth';
+import formidable from 'formidable';
+import Dataloader from 'dataloader';
+import { channelBatcher } from './batchFunction';
 
-import models from "./models";
-const SECRET = "12345";
-const SECRET2 = "1234512345";
+import models from './models';
+const SECRET = '12345';
+const SECRET2 = '1234512345';
 
-const typeDefs = mergeTypes(fileLoader(path.join(__dirname, "./schema")));
+const typeDefs = mergeTypes(fileLoader(path.join(__dirname, './schema')));
 
 const resolvers = mergeResolvers(
-  fileLoader(path.join(__dirname, "./resolvers"))
+  fileLoader(path.join(__dirname, './resolvers'))
 );
 
 const schema = new makeExecutableSchema({
@@ -33,13 +33,13 @@ const schema = new makeExecutableSchema({
 });
 
 const addUser = async (req, res, next) => {
-  const token = req.headers["xtoken"];
+  const token = req.headers['xtoken'];
   if (token) {
     try {
       const { user } = await jwt.verify(token, SECRET);
       req.user = user;
     } catch (err) {
-      const refreshToken = req.headers["xrefreshtoken"];
+      const refreshToken = req.headers['xrefreshtoken'];
 
       const newTokens = await refreshTokens(
         token,
@@ -52,17 +52,17 @@ const addUser = async (req, res, next) => {
 
       if (newTokens.token && newTokens.refreshToken) {
         // res.set("Access-Control-Expose-Headers", "*");
-        res.setHeader("xToken", newTokens.token);
-        res.setHeader("xRefreshToken", newTokens.refreshToken);
+        res.setHeader('xToken', newTokens.token);
+        res.setHeader('xRefreshToken', newTokens.refreshToken);
       }
     }
   }
   next();
 };
-const uploadDir = "files";
+const uploadDir = 'files';
 
 const fileMiddleware = (req, res, next) => {
-  if (!req.is("multipart/form-data")) {
+  if (!req.is('multipart/form-data')) {
     return next();
   }
 
@@ -96,13 +96,13 @@ const fileMiddleware = (req, res, next) => {
 const app = express();
 app.use(cors());
 // app.use(bodyParser.json());
-app.use("/files", express.static("files"));
+app.use('/files', express.static('files'));
 
 app.use(addUser);
 app.use(fileMiddleware);
 app.use(
   graphqlHTTP((req, res) => {
-    res.set({ "Access-Control-Expose-Headers": "*" }); // The frontEnd can read refreshToken
+    res.set({ 'Access-Control-Expose-Headers': '*' }); // The frontEnd can read refreshToken
 
     return {
       schema,
@@ -114,7 +114,7 @@ app.use(
         channelLoader: new Dataloader((ids) =>
           channelBatcher(ids, models, req.user)
         ),
-        serverUrl: `${req.protocol}://${req.get("host")}`,
+        serverUrl: `${req.protocol}://${req.get('host')}`,
       },
       graphiql: true,
       // subsriptionsEndpoint: "ws://localhost:8081/subscriptions",
@@ -126,7 +126,7 @@ const server = createServer(app);
 
 models.sequelize.sync().then(() => {
   server.listen(8080, () => {
-    console.log("server on port 8080");
+    console.log('server on port 8080');
     new SubscriptionServer(
       {
         execute,
@@ -159,7 +159,7 @@ models.sequelize.sync().then(() => {
       },
       {
         server: server,
-        path: "/subscriptions",
+        path: '/subscriptions',
       }
     );
   });

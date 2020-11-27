@@ -1,19 +1,26 @@
-version: "3"
-services: 
-  db:
-    image: posrgres
-    networks: 
-        - webnet
-    environment: 
+version: '3'
+services:
+  redis:
+    image: redis
+    networks:
+      - webnet
+  slack:
+    image: postgres
+    networks:
+      - webnet
+    environment:
       POSTGRES_PASSWORD: saizszmufvlzuvw0
       POSTGRES_USER: avnadmin
       POSTGRES_DB: slack
-      
-web:
-   image: slack-server
-   ports: :
-     - "8080:8080"
-   networks: 
-    - webnet
-networks: 
+  web:
+    image: slack-server
+    ports:
+      - '8080:8080'
+    networks:
+      - webnet
+    environment:
+      REDIS_HOST: redis
+      DB_HOST: slack
+    command: ['./wait-for-it.sh', 'db:5432', '--', 'node', 'index.js']
+networks:
   webnet:
