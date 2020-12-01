@@ -33,7 +33,8 @@ var models = {
   Message: sequelize.import('./message'),
   Team: sequelize.import('./team'),
   Member: sequelize.import('./member'),
-  PCMember: sequelize.import('./pcmember')
+  PCMember: sequelize.import('./pcmember'),
+  DirectMessage: sequelize.import('./directMessage')
 };
 (0, _keys2.default)(models).forEach(function (modelName) {
   if ('associate' in models[modelName]) {
