@@ -1,25 +1,25 @@
-import { requiersAuth, requiresTeamAccess } from "../permission";
-import { PubSub, withFilter } from "graphql-subscriptions";
-import pubsub from "../pubsub";
-import { GraphQLScalarType } from "graphql";
-import { Kind } from "graphql/language";
+import { requiersAuth, requiresTeamAccess } from '../permission';
+import { PubSub, withFilter } from 'graphql-subscriptions';
+import pubsub from '../pubsub';
+import { GraphQLScalarType } from 'graphql';
+import { Kind } from 'graphql/language';
 
-const NEW_CHANNEL_MESSAGE = "NEW_CHANNEL_MESSAGE";
+const NEW_CHANNEL_MESSAGE = 'NEW_CHANNEL_MESSAGE';
 
 export default {
   Date: new GraphQLScalarType({
-    name: "Date",
-    description: "Date custom scalar type",
+    name: 'Date',
+    description: 'Date custom scalar type',
     parseValue(value) {
-      console.log("----------------------------1", new Date(value));
+      console.log('----------------------------1', new Date(value));
       return new Date(value); // value from the client
     },
     serialize(value) {
-      console.log("----------------------------2", value, new Date(value));
+      console.log('----------------------------2', value, new Date(value));
       return value; // .getTime(); // value sent to the client
     },
     parseLiteral(ast) {
-      console.log("----------------------------3");
+      console.log('----------------------------3');
       if (ast.kind === Kind.INT) {
         return parseInt(ast.value, 10); // ast value is always in string format
       }
@@ -40,8 +40,10 @@ export default {
     },
   },
   Message: {
-    url: (parent, args, { serverUrl }) =>
-      parent.url ? `${serverUrl}/${parent.url}` : parent.url,
+    url: (parent, args) =>
+      parent.url
+        ? `${process.env.SERVER_URL || 'http://localhost:8080'}/${parent.url}`
+        : parent.url,
     user: async ({ user, userId }, args, { models }) => {
       if (user) {
         return user;
@@ -62,13 +64,13 @@ export default {
             where: { channelId, userId: user.id },
           });
           if (!member) {
-            throw new Error("Not Authorized");
+            throw new Error('Not Authorized');
           }
         }
 
         const options = {
           where: { channelId },
-          order: [["createdAt", "DESC"]],
+          order: [['createdAt', 'DESC']],
           limit: 10,
         };
 
